@@ -1,0 +1,5 @@
+package com.smartfeedback.servlet;
+
+public class LogoutServlet {
+
+}

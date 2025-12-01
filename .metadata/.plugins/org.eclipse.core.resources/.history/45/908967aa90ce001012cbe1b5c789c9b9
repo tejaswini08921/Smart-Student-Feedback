@@ -1,0 +1,613 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Student Feedback System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <style>
+        /* PASTEL PINK THEME */
+        :root {
+            --pastel-pink: #FFD6E7;
+            --pastel-pink-dark: #FFC2DA;
+            --soft-pink: #FFEBF3;
+            --rose-pink: #FF85A2;
+            --deep-rose: #E75480;
+            --lavender: #D8BFD8;
+            --mint: #B5EAD7;
+            --peach: #FFDAC1;
+            --light-yellow: #FFF8DC;
+            --light-blue: #B5E6FF;
+            --text-dark: #4A4A4A;
+            --text-light: #FFFFFF;
+        }
+        
+        body {
+            background-color: var(--pastel-pink) !important;
+            background-image: radial-gradient(circle at 20% 80%, var(--soft-pink) 0%, transparent 50%),
+                              radial-gradient(circle at 80% 20%, var(--light-blue) 0%, transparent 50%),
+                              radial-gradient(circle at 40% 40%, var(--mint) 0%, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-dark);
+            font-family: 'Segoe UI', 'Poppins', sans-serif;
+        }
+        
+        /* NAVIGATION - DEEP ROSE */
+        .navbar {
+            background: linear-gradient(135deg, var(--deep-rose) 0%, var(--rose-pink) 100%) !important;
+            box-shadow: 0 4px 20px rgba(231, 84, 128, 0.3);
+            border-bottom: 4px solid #D44D77;
+        }
+        
+        .navbar-brand {
+            font-size: 1.7rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .navbar-nav .nav-link {
+            font-weight: 600;
+            padding: 0.6rem 1.5rem;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+            color: white !important;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+        }
+        
+        .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* CARDS */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(231, 84, 128, 0.15);
+            transition: all 0.4s ease;
+            overflow: hidden;
+            border-left: 5px solid var(--rose-pink);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(231, 84, 128, 0.25);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--rose-pink) 0%, var(--deep-rose) 100%) !important;
+            color: white !important;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        /* FORM ELEMENTS */
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid var(--pastel-pink-dark);
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+            transition: all 0.3s ease;
+            color: var(--text-dark);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background: white;
+            border-color: var(--rose-pink);
+            box-shadow: 0 0 0 0.3rem rgba(255, 133, 162, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .form-label {
+            font-weight: 700;
+            color: var(--deep-rose);
+            margin-bottom: 0.8rem;
+            font-size: 1.05rem;
+        }
+        
+        /* STAR RATING */
+        .rating-stars {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 10px;
+        }
+        
+        .star-label {
+            font-size: 3rem;
+            color: var(--pastel-pink-dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));
+        }
+        
+        .star-label:hover {
+            color: var(--rose-pink);
+            transform: scale(1.3) rotate(10deg);
+        }
+        
+        .rating-stars input:checked ~ .star-label,
+        .rating-stars input:checked ~ .star-label ~ .star-label {
+            color: var(--deep-rose);
+        }
+        
+        /* BUTTONS */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--deep-rose) 0%, var(--rose-pink) 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 0.8rem 2.5rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(231, 84, 128, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(231, 84, 128, 0.6);
+            background: linear-gradient(135deg, var(--rose-pink) 0%, var(--deep-rose) 100%);
+        }
+        
+        /* INFO CARDS - DIFFERENT PASTEL COLORS */
+        .info-card-1 {
+            background: linear-gradient(135deg, var(--mint) 0%, #A7E8C9 100%) !important;
+            color: #2D6650;
+            border-left: 5px solid #8CDBB4;
+        }
+        
+        .info-card-2 {
+            background: linear-gradient(135deg, var(--light-blue) 0%, #9AD4FF 100%) !important;
+            color: #2A5A8C;
+            border-left: 5px solid #7BC4FF;
+        }
+        
+        .info-card-3 {
+            background: linear-gradient(135deg, var(--peach) 0%, #FFC8A2 100%) !important;
+            color: #B35900;
+            border-left: 5px solid #FFB07C;
+        }
+        
+        .info-card-1 i, .info-card-2 i, .info-card-3 i {
+            filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.1));
+        }
+        
+        /* TOAST NOTIFICATIONS */
+        .toast {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-left: 5px solid;
+        }
+        
+        .toast.success {
+            border-left-color: #50C878;
+        }
+        
+        .toast.error {
+            border-left-color: #FF6B6B;
+        }
+        
+        .toast-header {
+            border-radius: 15px 15px 0 0;
+            font-weight: 700;
+        }
+        
+        /* FOOTER */
+        footer {
+            background: linear-gradient(135deg, #4A4A4A 0%, #666666 100%) !important;
+            color: white;
+            margin-top: 4rem;
+            padding: 2rem 0;
+            border-top: 5px solid var(--rose-pink);
+        }
+        
+        footer i.fa-heart {
+            color: var(--rose-pink);
+            animation: heartbeat 1.5s infinite;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        /* ANIMATIONS */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* CUSTOM SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--pastel-pink);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--rose-pink), var(--deep-rose));
+            border-radius: 10px;
+            border: 3px solid var(--pastel-pink);
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, var(--deep-rose), var(--rose-pink));
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .star-label {
+                font-size: 2.2rem;
+            }
+            
+            .rating-stars {
+                gap: 8px;
+            }
+            
+            .btn-primary {
+                padding: 0.6rem 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark shadow">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="index.jsp">
+                <i class="fas fa-star me-2 floating"></i>Smart Feedback
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="admin/dashboard">
+                    <i class="fas fa-chart-line me-1"></i>Admin Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <c:if test="${not empty successMessage}">
+            <div class="toast show success" role="alert">
+                <div class="toast-header" style="background: linear-gradient(to right, #50c878, #3cb371); color: white;">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong class="me-auto">Success</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body">${successMessage}</div>
+            </div>
+        </c:if>
+        
+        <c:if test="${not empty errorMessage}">
+            <div class="toast show error" role="alert">
+                <div class="toast-header" style="background: linear-gradient(to right, #ff6b6b, #ff4757); color: white;">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong class="me-auto">Error</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body">${errorMessage}</div>
+            </div>
+        </c:if>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <!-- Header Card -->
+                <div class="card shadow-lg border-0 mb-5">
+                    <div class="card-header text-center py-5">
+                        <h1 class="display-4 fw-bold mb-3">
+                            <i class="fas fa-star me-3"></i>Student Feedback Portal
+                        </h1>
+                        <p class="lead mb-0 fs-4">Share your experience to help us improve education quality</p>
+                        <div class="mt-4">
+                            <span class="badge rounded-pill bg-light text-dark me-2 p-2">
+                                <i class="fas fa-shield-alt me-1"></i>100% Anonymous
+                            </span>
+                            <span class="badge rounded-pill bg-light text-dark me-2 p-2">
+                                <i class="fas fa-lock me-1"></i>Secure
+                            </span>
+                            <span class="badge rounded-pill bg-light text-dark p-2">
+                                <i class="fas fa-chart-line me-1"></i>Impactful
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Form Card -->
+                <div class="card shadow border-0 mb-5">
+                    <div class="card-body p-5">
+                        <form id="feedbackForm" action="submit-feedback" method="post" novalidate>
+                            <div class="row">
+                                <!-- Student Information -->
+                                <div class="col-md-6 mb-4">
+                                    <label for="studentName" class="form-label">
+                                        <i class="fas fa-user me-2"></i>Full Name *
+                                    </label>
+                                    <input type="text" class="form-control" id="studentName" name="studentName" 
+                                           value="${studentName}" required placeholder="Enter your full name">
+                                    <div class="invalid-feedback">Please provide your name.</div>
+                                </div>
+
+                                <div class="col-md-6 mb-4">
+                                    <label for="studentEmail" class="form-label">
+                                        <i class="fas fa-envelope me-2"></i>Email Address *
+                                    </label>
+                                    <input type="email" class="form-control" id="studentEmail" name="studentEmail" 
+                                           value="${studentEmail}" required placeholder="your.email@university.edu">
+                                    <div class="invalid-feedback">Please provide a valid email address.</div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Course & Instructor -->
+                                <div class="col-md-6 mb-4">
+                                    <label for="courseName" class="form-label">
+                                        <i class="fas fa-book me-2"></i>Course Name *
+                                    </label>
+                                    <select class="form-select" id="courseName" name="courseName" required>
+                                        <option value="">Select a course</option>
+                                        <option value="Advanced Java Programming" ${courseName == 'Advanced Java Programming' ? 'selected' : ''}>Advanced Java Programming</option>
+                                        <option value="Database Management Systems" ${courseName == 'Database Management Systems' ? 'selected' : ''}>Database Management Systems</option>
+                                        <option value="Web Development Fundamentals" ${courseName == 'Web Development Fundamentals' ? 'selected' : ''}>Web Development Fundamentals</option>
+                                        <option value="Data Structures & Algorithms" ${courseName == 'Data Structures & Algorithms' ? 'selected' : ''}>Data Structures & Algorithms</option>
+                                        <option value="Software Engineering" ${courseName == 'Software Engineering' ? 'selected' : ''}>Software Engineering</option>
+                                        <option value="Machine Learning" ${courseName == 'Machine Learning' ? 'selected' : ''}>Machine Learning</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select a course.</div>
+                                </div>
+
+                                <div class="col-md-6 mb-4">
+                                    <label for="instructorName" class="form-label">
+                                        <i class="fas fa-chalkboard-teacher me-2"></i>Instructor Name *
+                                    </label>
+                                    <select class="form-select" id="instructorName" name="instructorName" required>
+                                        <option value="">Select an instructor</option>
+                                        <option value="Dr. Sarah Johnson" ${instructorName == 'Dr. Sarah Johnson' ? 'selected' : ''}>Dr. Sarah Johnson</option>
+                                        <option value="Prof. Michael Brown" ${instructorName == 'Prof. Michael Brown' ? 'selected' : ''}>Prof. Michael Brown</option>
+                                        <option value="Prof. Robert Davis" ${instructorName == 'Prof. Robert Davis' ? 'selected' : ''}>Prof. Robert Davis</option>
+                                        <option value="Dr. Emily Wilson" ${instructorName == 'Dr. Emily Wilson' ? 'selected' : ''}>Dr. Emily Wilson</option>
+                                        <option value="Prof. James Miller" ${instructorName == 'Prof. James Miller' ? 'selected' : ''}>Prof. James Miller</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select an instructor.</div>
+                                </div>
+                            </div>
+
+                            <!-- Rating Section -->
+                            <div class="mb-5">
+                                <label class="form-label d-block text-center mb-4">
+                                    <i class="fas fa-star me-2"></i>Course Rating *
+                                </label>
+                                <div class="rating-container">
+                                    <div class="rating-stars mb-3">
+                                        <input type="radio" id="star5" name="rating" value="5" class="d-none" ${param.rating == '5' ? 'checked' : ''}>
+                                        <label for="star5" class="star-label"><i class="fas fa-star"></i></label>
+                                        
+                                        <input type="radio" id="star4" name="rating" value="4" class="d-none" ${param.rating == '4' ? 'checked' : ''}>
+                                        <label for="star4" class="star-label"><i class="fas fa-star"></i></label>
+                                        
+                                        <input type="radio" id="star3" name="rating" value="3" class="d-none" ${param.rating == '3' ? 'checked' : ''}>
+                                        <label for="star3" class="star-label"><i class="fas fa-star"></i></label>
+                                        
+                                        <input type="radio" id="star2" name="rating" value="2" class="d-none" ${param.rating == '2' ? 'checked' : ''}>
+                                        <label for="star2" class="star-label"><i class="fas fa-star"></i></label>
+                                        
+                                        <input type="radio" id="star1" name="rating" value="1" class="d-none" ${param.rating == '1' ? 'checked' : ''}>
+                                        <label for="star1" class="star-label"><i class="fas fa-star"></i></label>
+                                    </div>
+                                    <div class="text-center">
+                                        <small class="text-muted d-block mb-2">Click on a star to rate</small>
+                                        <div class="d-flex justify-content-center align-items-center">
+                                            <span class="badge bg-danger me-2">1 = Poor</span>
+                                            <span class="badge bg-warning me-2">3 = Average</span>
+                                            <span class="badge bg-success">5 = Excellent</span>
+                                        </div>
+                                    </div>
+                                    <div class="invalid-feedback d-block text-center mt-2">Please select a rating.</div>
+                                </div>
+                            </div>
+
+                            <!-- Comments -->
+                            <div class="mb-5">
+                                <label for="comments" class="form-label">
+                                    <i class="fas fa-comment-dots me-2"></i>Additional Comments
+                                </label>
+                                <textarea class="form-control" id="comments" name="comments" rows="5" 
+                                          placeholder="Share your thoughts about the course, instructor, suggestions for improvement...">${comments}</textarea>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i> Your comments help us improve the learning experience
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="text-center pt-3">
+                                <button type="submit" class="btn btn-primary btn-lg px-5">
+                                    <i class="fas fa-paper-plane me-2"></i>Submit Feedback
+                                </button>
+                                <p class="text-muted mt-3">
+                                    <i class="fas fa-clock me-1"></i> Takes only 2 minutes
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Info Cards -->
+                <div class="row mt-5">
+                    <div class="col-md-4 mb-4">
+                        <div class="card info-card-1 text-center border-0 shadow">
+                            <div class="card-body py-4">
+                                <i class="fas fa-shield-alt fa-3x mb-3"></i>
+                                <h5 class="card-title fw-bold mb-2">Anonymous & Secure</h5>
+                                <p class="card-text mb-0">Your identity is protected. Feedback is confidential.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card info-card-2 text-center border-0 shadow">
+                            <div class="card-body py-4">
+                                <i class="fas fa-chart-line fa-3x mb-3"></i>
+                                <h5 class="card-title fw-bold mb-2">Drive Improvements</h5>
+                                <p class="card-text mb-0">Your feedback directly impacts course improvements.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card info-card-3 text-center border-0 shadow">
+                            <div class="card-body py-4">
+                                <i class="fas fa-graduation-cap fa-3x mb-3"></i>
+                                <h5 class="card-title fw-bold mb-2">Enhance Learning</h5>
+                                <p class="card-text mb-0">Help shape better learning experiences for everyone.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-white text-center py-5 mt-5">
+        <div class="container">
+            <h4 class="mb-3">Smart Student Feedback System</h4>
+            <p class="mb-4">Transforming education through valuable student insights</p>
+            <div class="mb-4">
+                <a href="#" class="text-light me-3"><i class="fab fa-twitter fa-lg"></i></a>
+                <a href="#" class="text-light me-3"><i class="fab fa-facebook fa-lg"></i></a>
+                <a href="#" class="text-light me-3"><i class="fab fa-linkedin fa-lg"></i></a>
+                <a href="#" class="text-light"><i class="fab fa-instagram fa-lg"></i></a>
+            </div>
+            <p class="mb-0">&copy; 2024 Smart Student Feedback System. All rights reserved.</p>
+            <small class="text-light">Made with <i class="fas fa-heart"></i> for better education</small>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/script.js"></script>
+    
+    <script>
+        // Enhanced star rating with animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const stars = document.querySelectorAll('.star-label');
+            const starContainer = document.querySelector('.rating-stars');
+            
+            stars.forEach(star => {
+                star.addEventListener('click', function(e) {
+                    const rating = this.previousElementSibling.value;
+                    highlightStars(rating);
+                    animateStars();
+                });
+                
+                star.addEventListener('mouseover', function() {
+                    const rating = this.previousElementSibling.value;
+                    previewStars(rating);
+                });
+            });
+            
+            starContainer.addEventListener('mouseleave', function() {
+                const checkedStar = document.querySelector('.rating-stars input:checked');
+                if (checkedStar) {
+                    highlightStars(checkedStar.value);
+                } else {
+                    resetStars();
+                }
+            });
+            
+            function highlightStars(rating) {
+                stars.forEach((star, index) => {
+                    if (index < 5 - rating) {
+                        star.style.color = '#FFC2DA';
+                        star.style.transform = 'scale(1)';
+                    } else {
+                        star.style.color = '#E75480';
+                        star.style.transform = 'scale(1.2)';
+                    }
+                });
+            }
+            
+            function previewStars(rating) {
+                stars.forEach((star, index) => {
+                    if (index < 5 - rating) {
+                        star.style.color = '#FFC2DA';
+                    } else {
+                        star.style.color = '#FF85A2';
+                    }
+                });
+            }
+            
+            function resetStars() {
+                stars.forEach(star => {
+                    star.style.color = '#FFC2DA';
+                    star.style.transform = 'scale(1)';
+                });
+            }
+            
+            function animateStars() {
+                stars.forEach((star, index) => {
+                    setTimeout(() => {
+                        star.style.transform = 'scale(1.3)';
+                        setTimeout(() => {
+                            star.style.transform = 'scale(1.2)';
+                        }, 100);
+                    }, index * 50);
+                });
+            }
+            
+            // Initialize
+            const checkedStar = document.querySelector('.rating-stars input:checked');
+            if (checkedStar) {
+                highlightStars(checkedStar.value);
+            }
+        });
+        
+        // Form validation enhancement
+        const form = document.getElementById('feedbackForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Add shake animation to invalid fields
+                    const invalidFields = form.querySelectorAll(':invalid');
+                    invalidFields.forEach(field => {
+                        field.classList.add('animate__animated', 'animate__shakeX');
+                        setTimeout(() => {
+                            field.classList.remove('animate__animated', 'animate__shakeX');
+                        }, 1000);
+                    });
+                }
+                form.classList.add('was-validated');
+            });
+        }
+    </script>
+    
+    <!-- Animate.css for animations -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+</body>
+</html>

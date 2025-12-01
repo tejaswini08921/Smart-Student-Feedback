@@ -1,0 +1,5 @@
+package com.smartfeedback.filter;
+
+public class AuthFilter {
+
+}

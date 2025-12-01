@@ -1,0 +1,70 @@
+package com.smartfeedback.util;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import jakarta.servlet.ServletContext;
+
+public class DBUtil {
+    // Updated for MySQL Connector/J 9.x
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/student_feedback_db?useSSL=false&serverTimezone=UTC";
+    private static final String JDBC_USERNAME = "root";
+    private static final String JDBC_PASSWORD = "password";
+    private static boolean driverLoaded = false;
+
+    static {
+        try {
+            // For MySQL Connector/J 9.x (mysql-connector-j-9.5.0)
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            driverLoaded = true;
+            System.out.println("✅ MySQL Driver 9.x loaded successfully!");
+        } catch (ClassNotFoundException e) {
+            System.err.println("❌ ERROR: MySQL JDBC Driver not found!");
+            System.err.println("Check that mysql-connector-j-9.5.0.jar is in WEB-INF/lib/");
+            e.printStackTrace();
+        }
+    }
+
+    public static Connection getConnection() throws SQLException {
+        if (!driverLoaded) {
+            throw new SQLException("MySQL Driver not loaded. Check server logs.");
+        }
+        try {
+            Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
+            System.out.println("✅ Database connection successful!");
+            return conn;
+        } catch (SQLException e) {
+            System.err.println("❌ Database connection failed!");
+            System.err.println("URL: " + JDBC_URL);
+            System.err.println("Error: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public static Connection getConnection(ServletContext context) throws SQLException {
+        if (!driverLoaded) {
+            throw new SQLException("MySQL Driver not loaded. Check server logs.");
+        }
+        String url = context.getInitParameter("jdbcURL");
+        String username = context.getInitParameter("jdbcUsername");
+        String password = context.getInitParameter("jdbcPassword");
+        
+        // Add parameters if not present
+        if (url != null && !url.contains("?")) {
+            url += "?useSSL=false&serverTimezone=UTC";
+        }
+        
+        return DriverManager.getConnection(url, username, password);
+    }
+
+    public static void closeConnection(Connection connection) {
+        if (connection != null) {
+            try {
+                connection.close();
+                System.out.println("Database connection closed.");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}

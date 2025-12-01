@@ -1,0 +1,68 @@
+package com.smartfeedback.servlet;
+
+import com.smartfeedback.dao.FeedbackDAO;
+import com.smartfeedback.model.Feedback;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
+
+@WebServlet("/admin/dashboard")
+public class DashboardServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    private FeedbackDAO feedbackDAO;
+
+    public void init() {
+        feedbackDAO = new FeedbackDAO();
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        String action = request.getParameter("action");
+        String searchTerm = request.getParameter("search");
+        
+        List<Feedback> feedbackList;
+
+        try {
+            if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+                // Search functionality
+                feedbackList = feedbackDAO.searchFeedback(searchTerm.trim());
+                request.setAttribute("searchTerm", searchTerm);
+            } else {
+                // Get all feedback
+                feedbackList = feedbackDAO.getAllFeedback();
+            }
+
+            // Get analytics data for cards
+            int totalFeedback = feedbackDAO.getTotalFeedbackCount();
+            List<Object[]> courseAnalytics = feedbackDAO.getAverageRatingsPerCourse();
+            List<Object[]> instructorAnalytics = feedbackDAO.getInstructorPerformance();
+            List<Object[]> ratingDistribution = feedbackDAO.getRatingDistribution();
+
+            // Set attributes for JSP
+            request.setAttribute("feedbackList", feedbackList);
+            request.setAttribute("totalFeedback", totalFeedback);
+            request.setAttribute("courseAnalytics", courseAnalytics);
+            request.setAttribute("instructorAnalytics", instructorAnalytics);
+            request.setAttribute("ratingDistribution", ratingDistribution);
+
+            // Forward to admin dashboard
+            request.getRequestDispatcher("/admin/dashboard.jsp").forward(request, response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Error loading dashboard data: " + e.getMessage());
+            request.getRequestDispatcher("/admin/dashboard.jsp").forward(request, response);
+        }
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        // Handle POST requests same as GET for search functionality
+        doGet(request, response);
+    }
+}

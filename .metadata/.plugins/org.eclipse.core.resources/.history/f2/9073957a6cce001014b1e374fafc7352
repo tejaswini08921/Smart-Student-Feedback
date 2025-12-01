@@ -1,0 +1,5 @@
+package com.smartfeedback.util;
+
+public class DBUtil {
+
+}
