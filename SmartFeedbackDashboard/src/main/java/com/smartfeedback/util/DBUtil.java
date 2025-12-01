@@ -1,0 +1,91 @@
+package com.smartfeedback.util;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import jakarta.servlet.ServletContext;
+
+public class DBUtil {
+	private static final String JDBC_URL = "jdbc:mysql://localhost:3306/student_feedback?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";    private static final String JDBC_USERNAME = "root";
+    private static final String JDBC_PASSWORD = "rootroot";
+    private static boolean driverLoaded = false;
+    
+    static {
+        loadDriver();
+    }
+    
+    private static void loadDriver() {
+        // Try multiple ways to load the driver
+        String[] driverClasses = {
+            "com.mysql.cj.jdbc.Driver",  // MySQL 8.x/9.x
+            "com.mysql.jdbc.Driver"      // Older MySQL
+        };
+        
+        for (String driverClass : driverClasses) {
+            try {
+                System.out.println("Trying to load driver: " + driverClass);
+                Class.forName(driverClass);
+                driverLoaded = true;
+                System.out.println("✅ SUCCESS: Loaded driver: " + driverClass);
+                break;
+            } catch (ClassNotFoundException e) {
+                System.out.println("⚠️ Failed to load driver: " + driverClass);
+            }
+        }
+        
+        if (!driverLoaded) {
+            System.err.println("❌ CRITICAL: No MySQL driver found!");
+            System.err.println("Please ensure mysql-connector-j-9.5.0.jar is in:");
+            System.err.println("1. WEB-INF/lib/ folder");
+            System.err.println("2. Tomcat lib/ folder");
+            System.err.println("3. Project Build Path");
+        }
+    }
+
+    public static Connection getConnection() throws SQLException {
+        if (!driverLoaded) {
+            throw new SQLException("MySQL Driver not loaded. Check console for driver loading errors.");
+        }
+        
+        System.out.println("Attempting connection to: " + JDBC_URL);
+        try {
+            Connection conn = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
+            System.out.println("✅ Database connection SUCCESSFUL!");
+            return conn;
+        } catch (SQLException e) {
+            System.err.println("❌ Database connection FAILED!");
+            System.err.println("Error: " + e.getMessage());
+            System.err.println("URL: " + JDBC_URL);
+            System.err.println("Username: " + JDBC_USERNAME);
+            throw e;
+        }
+    }
+    
+    // ... rest of the methods
+    public static Connection getConnection(ServletContext context) throws SQLException {
+        if (!driverLoaded) {
+            throw new SQLException("MySQL Driver not loaded. Check server logs.");
+        }
+        String url = context.getInitParameter("jdbcURL");
+        String username = context.getInitParameter("jdbcUsername");
+        String password = context.getInitParameter("jdbcPassword");
+        
+        // Add parameters if not present
+        if (url != null && !url.contains("?")) {
+            url += "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
+        }
+        
+        return DriverManager.getConnection(url, username, password);
+    }
+
+    public static void closeConnection(Connection connection) {
+        if (connection != null) {
+            try {
+                connection.close();
+                System.out.println("Database connection closed.");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
